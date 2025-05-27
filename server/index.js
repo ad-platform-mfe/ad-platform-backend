@@ -28,6 +28,8 @@ async function initDatabase() {
         password VARCHAR(255) NOT NULL
       );
     `);
+  
+    
     connection.release();
     console.log('Database initialized successfully');
   } catch (error) {
@@ -40,7 +42,7 @@ initDatabase();
 
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
-  
+
   // 验证请求体
   if (!username || !password) {
     return res.json({
@@ -61,7 +63,7 @@ app.post('/api/register', async (req, res) => {
 
     // 添加新用户
     await pool.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, password]);
-    
+
     res.json({
       code: 200,
       message: '注册成功'
@@ -81,7 +83,7 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-  
+
   // 验证请求体
   if (!username || !password) {
     return res.json({
@@ -93,7 +95,7 @@ app.post('/api/login', async (req, res) => {
   try {
     // 用户验证
     const [rows] = await pool.execute('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
-    
+
     if (rows.length > 0) {
       res.json({
         code: 200,
@@ -116,15 +118,15 @@ app.post('/api/login', async (req, res) => {
 });
 
 // 客户管理接口
-app.get('/api/client', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM client');
+    const [rows] = await pool.execute('SELECT * FROM users');
     res.json({
       code: 200,
       data: rows
     });
   } catch (error) {
-    console.error('Get client error:', error);
+    console.error('Get users error:', error);
     res.json({
       code: 500,
       message: '获取客户列表失败'
@@ -132,9 +134,9 @@ app.get('/api/client', async (req, res) => {
   }
 });
 
-app.post('/api/client', async (req, res) => {
-  const { name, contact, email } = req.body;
-  if (!name || !contact || !email) {
+app.post('/api/users', async (req, res) => {
+  const { username,password, phone, email } = req.body;
+  if (!username || !password || !phone || !email) {
     return res.json({
       code: 400,
       message: '必填字段不能为空'
@@ -142,8 +144,8 @@ app.post('/api/client', async (req, res) => {
   }
   try {
     const [result] = await pool.execute(
-      'INSERT INTO client (name, contact, email) VALUES (?, ?, ?)',
-      [name, contact, email]
+      'INSERT INTO users (username, password,phone, email ) VALUES (?,?, ?, ?)',
+      [username, password,phone, email ]
     );
     res.json({
       code: 200,
@@ -151,7 +153,7 @@ app.post('/api/client', async (req, res) => {
       data: { id: result.insertId }
     });
   } catch (error) {
-    console.error('Add client error:', error);
+    console.error('Add users error:', error);
     res.json({
       code: 500,
       message: '添加客户失败'
@@ -159,10 +161,10 @@ app.post('/api/client', async (req, res) => {
   }
 });
 
-app.put('/api/client/:id', async (req, res) => {
+app.put('/api/users/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, contact,email } = req.body;
-  if (!name || !contact || !email) {
+  const { username, password,phone, email } = req.body;
+  if (!username || !password || !phone || !email) {
     return res.json({
       code: 400,
       message: '必填字段不能为空'
@@ -170,15 +172,15 @@ app.put('/api/client/:id', async (req, res) => {
   }
   try {
     await pool.execute(
-      'UPDATE client SET name = ?, contact = ?,email = ? WHERE id = ?',
-      [name, contact, email, id]
+      'UPDATE users SET username = ?, password = ?,phone = ?,email = ? WHERE id = ?',
+      [username,  password ,phone, email, id]
     );
     res.json({
       code: 200,
       message: '更新客户信息成功'
     });
   } catch (error) {
-    console.error('Update client error:', error);
+    console.error('Update users error:', error);
     res.json({
       code: 500,
       message: '更新客户信息失败'
@@ -186,16 +188,16 @@ app.put('/api/client/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/client/:id', async (req, res) => {
+app.delete('/api/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.execute('DELETE FROM client WHERE id = ?', [id]);
+    await pool.execute('DELETE FROM users WHERE id = ?', [id]);
     res.json({
       code: 200,
       message: '删除客户成功'
     });
   } catch (error) {
-    console.error('Delete client error:', error);
+    console.error('Delete users error:', error);
     res.json({
       code: 500,
       message: '删除客户失败'
@@ -231,7 +233,7 @@ app.post('/api/device', async (req, res) => {
   try {
     const [result] = await pool.execute(
       'INSERT INTO device (name, location, status) VALUES (?, ?, ?)',
-      [name, location, status ]
+      [name, location, status]
     );
     res.json({
       code: 200,
@@ -309,8 +311,8 @@ app.get('/api/content', async (req, res) => {
 });
 
 app.post('/api/content', async (req, res) => {
-  const { title, duration, file_url,upload_time } = req.body;
-  if (!title || !file_url || !duration || !upload_time) {
+  const { title, text,type, file_url, upload_time } = req.body;
+  if (!title || !file_url || !text || !type || !upload_time) {
     return res.json({
       code: 400,
       message: '必填字段不能为空'
@@ -318,8 +320,8 @@ app.post('/api/content', async (req, res) => {
   }
   try {
     const [result] = await pool.execute(
-      'INSERT INTO content (title, duration, file_url,upload_time) VALUES (?, ?, ?, ?)',
-      [title, duration, file_url,upload_time]
+      'INSERT INTO content (title, text,type, file_url, upload_time) VALUES (?, ?,?, ?, ?)',
+      [title, text,type, file_url, upload_time]
     );
     res.json({
       code: 200,
@@ -337,8 +339,8 @@ app.post('/api/content', async (req, res) => {
 
 app.put('/api/content/:id', async (req, res) => {
   const { id } = req.params;
-  const {title, duration, file_url,upload_time } = req.body;
-  if (!title || !duration || !file_url || !upload_time) {
+  const { title, text,type, file_url, upload_time } = req.body;
+  if (!title || !file_url || !text || !type || !upload_time) {
     return res.json({
       code: 400,
       message: '必填字段不能为空'
@@ -348,8 +350,8 @@ app.put('/api/content/:id', async (req, res) => {
     // Convert ISO datetime to MySQL compatible format
     const mysqlDateTime = new Date(upload_time).toISOString().slice(0, 19).replace('T', ' ');
     await pool.execute(
-      'UPDATE content SET title = ?, duration = ?, file_url = ?, upload_time = ? WHERE id = ?',
-      [title, duration, file_url, mysqlDateTime, id]
+      'UPDATE content SET title = ?, text = ?, type = ?, file_url = ?, upload_time = ? WHERE id = ?',
+      [title, text,type, file_url, mysqlDateTime,id]
     );
     res.json({
       code: 200,
@@ -402,8 +404,8 @@ app.get('/api/schedule', async (req, res) => {
 
 app.put('/api/schedule/:id', async (req, res) => {
   const { id } = req.params;
-  const {start_time, end_time,play_mode } = req.body;
-  if (!start_time || !end_time || !play_mode ) {
+  const { start_time, end_time, play_mode, is_available, price } = req.body;
+  if (!start_time || !end_time || !play_mode) {
     return res.json({
       code: 400,
       message: '必填字段不能为空'
@@ -413,20 +415,50 @@ app.put('/api/schedule/:id', async (req, res) => {
     // Convert ISO datetime to MySQL compatible format
     const mysqlStartTime = new Date(start_time).toISOString().slice(0, 19).replace('T', ' ');
     const mysqlEndTime = new Date(end_time).toISOString().slice(0, 19).replace('T', ' ');
-    
+
     await pool.execute(
-      'UPDATE schedule SET start_time = ?, end_time = ?, play_mode = ? WHERE id = ?',
-      [mysqlStartTime, mysqlEndTime, play_mode, id]
+      'UPDATE schedule SET start_time = ?, end_time = ?, play_mode = ?, is_available = ?, price = ? WHERE id = ?',
+      [mysqlStartTime, mysqlEndTime, play_mode, is_available, price, id]
     );
     res.json({
       code: 200,
-      message: '更新广告内容成功'
+      message: '更新播放排期成功'
     });
   } catch (error) {
     console.error('Update schedule error:', error);
     res.json({
       code: 500,
       message: '更新播放排期失败'
+    });
+  }
+});
+
+app.post('/api/schedule', async (req, res) => {
+  const { device_id, content_id, start_time, end_time, play_mode, is_available, price } = req.body;
+  if (!device_id || !content_id || !start_time || !end_time || !play_mode) {
+    return res.json({
+      code: 400,
+      message: '必填字段不能为空'
+    });
+  }
+  try {
+    const mysqlStartTime = new Date(start_time).toISOString().slice(0, 19).replace('T', ' ');
+    const mysqlEndTime = new Date(end_time).toISOString().slice(0, 19).replace('T', ' ');
+
+    const [result] = await pool.execute(
+      'INSERT INTO schedule (device_id, content_id, start_time, end_time, play_mode, is_available, price) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [device_id, content_id, mysqlStartTime, mysqlEndTime, play_mode, is_available || '是', price || 0]
+    );
+    res.json({
+      code: 200,
+      message: '添加播放排期成功',
+      data: { id: result.insertId }
+    });
+  } catch (error) {
+    console.error('Add schedule error:', error);
+    res.json({
+      code: 500,
+      message: '添加播放排期失败'
     });
   }
 });
@@ -449,6 +481,75 @@ app.delete('/api/schedule/:id', async (req, res) => {
     res.json({
       code: 500,
       message: '删除广告内容失败'
+    });
+  }
+});
+
+// 播放日志接口
+app.get('/api/play_log', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(`
+      SELECT pl.*, u.username, c.title as content_title, d.name as device_name , s.start_time as schedule_start_time, s.end_time as schedule_end_time
+      FROM play_log pl
+      LEFT JOIN users u ON pl.user_id = u.id
+      LEFT JOIN content c ON pl.content_id = c.id
+      LEFT JOIN device d ON pl.device_id = d.id
+      LEFT JOIN schedule s ON pl.schedule_id = s.id
+      ORDER BY pl.id DESC
+    `);
+    res.json({
+      code: 200,
+      data: rows
+    });
+  } catch (error) {
+    console.error('Get play_log error:', error);
+    res.json({
+      code: 500,
+      message: '获取播放日志失败'
+    });
+  }
+});
+
+app.post('/api/play_log', async (req, res) => {
+  const { user_id, content_id, device_id, schedule_id } = req.body;
+  if (!user_id || !content_id || !device_id || !schedule_id) {
+    return res.json({
+      code: 400,
+      message: '必填字段不能为空'
+    });
+  }
+  try {
+    const [result] = await pool.execute(
+      'INSERT INTO play_log (user_id, content_id, device_id, schedule_id) VALUES (?, ?, ?, ?)',
+      [user_id, content_id, device_id, schedule_id]
+    );
+    res.json({
+      code: 200,
+      message: '添加播放日志成功',
+      data: { id: result.insertId }
+    });
+  } catch (error) {
+    console.error('Add play_log error:', error);
+    res.json({
+      code: 500,
+      message: '添加播放日志失败'
+    });
+  }
+});
+
+app.delete('/api/play_log/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.execute('DELETE FROM play_log WHERE id = ?', [id]);
+    res.json({
+      code: 200,
+      message: '删除播放日志成功'
+    });
+  } catch (error) {
+    console.error('Delete play_log error:', error);
+    res.json({
+      code: 500,
+      message: '删除播放日志失败'
     });
   }
 });

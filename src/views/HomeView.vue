@@ -15,23 +15,26 @@
           <el-menu-item index="2">设备管理</el-menu-item>
           <el-menu-item index="3">广告内容</el-menu-item>
           <el-menu-item index="4">播放排期</el-menu-item>
+          <el-menu-item index="5">播放日志</el-menu-item>
         </el-menu>
       </el-header>
       <el-main>
         <div v-if="activeIndex === '1'">
           <h2>客户管理</h2>
-          <el-table :data="clientData" style="width: 100%">
+          <el-table :data="usersData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column
-              prop="name"
-              label="公司/个人名称"
+              prop="username"
+              label="用户名"
             ></el-table-column>
-            <el-table-column prop="contact" label="联系电话"></el-table-column>
+            <el-table-column prop="password" label="密码"></el-table-column>
+            <el-table-column prop="phone" label="联系电话"></el-table-column>
             <el-table-column prop="email" label="电子邮箱"></el-table-column>
             <el-table-column
               prop="create_time"
               label="创建时间"
             ></el-table-column>
+            <el-table-column prop="status" label="状态"></el-table-column>
             <el-table-column label="操作" width="180">
               <template slot-scope="scope">
                 <el-button size="mini" @click="handleEdit(scope.row)"
@@ -81,10 +84,14 @@
           <el-table :data="contentData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column prop="title" label="广告标题"></el-table-column>
-            <el-table-column prop="file_url" label="广告内容"></el-table-column>
+            <el-table-column prop="file_url" label="广告存储路径"></el-table-column>
             <el-table-column
-              prop="duration"
-              label="播放时长(秒)"
+              prop="text"
+              label="文字内容"
+            ></el-table-column>
+            <el-table-column
+              prop="type"
+              label="广告类型"
             ></el-table-column>
             <el-table-column
               prop="upload_time"
@@ -129,11 +136,46 @@
               prop="play_mode"
               label="播放模式"
             ></el-table-column>
+            <el-table-column
+              prop="is_available"
+              label="可否选择"
+            >
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.is_available === '是' ? 'success' : 'danger'">
+                  {{ scope.row.is_available }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="price"
+              label="价格"
+            ></el-table-column>
             <el-table-column label="操作" width="180">
               <template slot-scope="scope">
                 <el-button size="mini" @click="handleEdit(scope.row)"
                   >编辑</el-button
                 >
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.row)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div v-if="activeIndex === '5'">
+          <h2>播放日志</h2>
+          <el-table :data="playLogData" style="width: 100%">
+            <el-table-column prop="id" label="ID" width="80"></el-table-column>
+            <el-table-column prop="username" label="用户名"></el-table-column>
+            <el-table-column prop="content_title" label="广告标题"></el-table-column>
+            <el-table-column prop="device_name" label="设备名称"></el-table-column>
+            <el-table-column prop="schedule_start_time" label="开始播放时间"></el-table-column>
+            <el-table-column prop="schedule_end_time" label="结束播放时间"></el-table-column>
+            <el-table-column label="操作" width="180">
+              <template slot-scope="scope">
                 <el-button
                   size="mini"
                   type="danger"
@@ -159,17 +201,23 @@
       width="50%"
     >
       <el-form :model="editForm" label-width="120px">
-        <el-form-item
-          label="名称"
-          v-if="activeIndex === '1' || activeIndex === '2'"
-        >
-          <el-input v-model="editForm.name"></el-input>
+        <el-form-item label="用户名" v-if="activeIndex === '1'">
+          <el-input v-model="editForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" v-if="activeIndex === '1'">
+          <el-input v-model="editForm.password"></el-input>
         </el-form-item>
         <el-form-item label="联系电话" v-if="activeIndex === '1'">
-          <el-input v-model="editForm.contact"></el-input>
+          <el-input v-model="editForm.phone"></el-input>
         </el-form-item>
         <el-form-item label="电子邮箱" v-if="activeIndex === '1'">
           <el-input v-model="editForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" v-if="activeIndex === '1'">
+          <el-select v-model="editForm.status" placeholder="请选择">
+            <el-option label="启用" value="启用"></el-option>
+            <el-option label="禁用" value="禁用"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="安装位置" v-if="activeIndex === '2'">
           <el-input v-model="editForm.location"></el-input>
@@ -186,6 +234,15 @@
         </el-form-item>
         <el-form-item label="广告内容" v-if="activeIndex === '3'">
           <el-input v-model="editForm.file_url"></el-input>
+        </el-form-item>
+        <el-form-item label="文字内容" v-if="activeIndex === '3'">
+          <el-input v-model="editForm.text"></el-input>
+        </el-form-item>
+        <el-form-item label="广告类型" v-if="activeIndex === '3'">
+          <el-select v-model="editForm.type" placeholder="请选择"></el-select>
+            <el-option label="图片" value="图片"></el-option>
+            <el-option label="视频" value="视频"></el-option>
+            <el-option label="文字" value="文字"></el-option>
         </el-form-item>
         <el-form-item label="播放开始时间" v-if="activeIndex === '4'">
           <el-date-picker
@@ -211,6 +268,15 @@
             <el-option label="循环" value="循环"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="可否选择" v-if="activeIndex === '4'">
+          <el-select v-model="editForm.is_available" placeholder="请选择">
+            <el-option label="是" value="是"></el-option>
+            <el-option label="否" value="否"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="价格" v-if="activeIndex === '4'">
+          <el-input-number v-model="editForm.price" :precision="2" :step="0.1" :min="0"></el-input-number>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -227,14 +293,17 @@ export default {
   data() {
     return {
       activeIndex: "1",
-      clientData: [],
+      usersData: [],
       deviceData: [],
       contentData: [],
       scheduleData: [],
+      playLogData: [],
       dialogVisible: false,
       editForm: {
         start_time: "",
         end_time: "",
+        is_available: "是",
+        price: 0,
       },
     };
   },
@@ -244,16 +313,17 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const [clientsRes, devicesRes, contentsRes, scheduleRes] =
+        const [usersRes, devicesRes, contentsRes, scheduleRes, playLogRes] =
           await Promise.all([
-            axios.get("http://localhost:3030/api/client"),
+            axios.get("http://localhost:3030/api/users"),
             axios.get("http://localhost:3030/api/device"),
             axios.get("http://localhost:3030/api/content"),
             axios.get("http://localhost:3030/api/schedule"),
+            axios.get("http://localhost:3030/api/play_log"),
           ]);
 
-        if (clientsRes.data.code === 200) {
-          this.clientData = clientsRes.data.data;
+        if (usersRes.data.code === 200) {
+          this.usersData = usersRes.data.data;
         }
         if (devicesRes.data.code === 200) {
           this.deviceData = devicesRes.data.data;
@@ -263,6 +333,9 @@ export default {
         }
         if (scheduleRes.data.code === 200) {
           this.scheduleData = scheduleRes.data.data;
+        }
+        if (playLogRes.data.code === 200) {
+          this.playLogData = playLogRes.data.data;
         }
       } catch (error) {
         console.error("获取数据失败:", error);
@@ -288,7 +361,7 @@ export default {
         let endpoint = "";
         switch (this.activeIndex) {
           case "1":
-            endpoint = `/api/client/${this.editForm.id}`;
+            endpoint = `/api/users/${this.editForm.id}`;
             break;
           case "2":
             endpoint = `/api/device/${this.editForm.id}`;
@@ -322,7 +395,7 @@ export default {
         let endpoint = "";
         switch (this.activeIndex) {
           case "1":
-            endpoint = `/api/client/${row.id}`;
+            endpoint = `/api/users/${row.id}`;
             break;
           case "2":
             endpoint = `/api/device/${row.id}`;
@@ -332,7 +405,10 @@ export default {
             break;
           case "4":
             endpoint = `/api/schedule/${row.id}`;
-          break;
+            break;
+          case "5":
+            endpoint = `/api/play_log/${row.id}`;
+            break;
         }
 
         const response = await axios.delete(`http://localhost:3030${endpoint}`);
@@ -346,6 +422,9 @@ export default {
         console.error("删除失败:", error);
         this.$message.error("删除失败，请稍后重试");
       }
+    },
+    async handleAdd() {
+      
     },
   },
 };
