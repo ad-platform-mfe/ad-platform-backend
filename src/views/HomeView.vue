@@ -21,6 +21,7 @@
       <el-main>
         <div v-if="activeIndex === '1'">
           <h2>客户管理</h2>
+          <el-button type="primary" @click="handleAdd" style="margin-bottom: 15px">新增客户</el-button>
           <el-table :data="usersData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column
@@ -52,6 +53,7 @@
         </div>
         <div v-if="activeIndex === '2'">
           <h2>设备管理</h2>
+          <el-button type="primary" @click="handleAdd" style="margin-bottom: 15px">新增设备</el-button>
           <el-table :data="deviceData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column prop="name" label="设备显示名称"></el-table-column>
@@ -81,6 +83,7 @@
         </div>
         <div v-if="activeIndex === '3'">
           <h2>广告内容</h2>
+          <el-button type="primary" @click="handleAdd" style="margin-bottom: 15px">新增广告</el-button>
           <el-table :data="contentData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column prop="title" label="广告标题"></el-table-column>
@@ -114,15 +117,12 @@
         </div>
         <div v-if="activeIndex === '4'">
           <h2>播放排期</h2>
+          <el-button type="primary" @click="handleAdd" style="margin-bottom: 15px">新增排期</el-button>
           <el-table :data="scheduleData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column
               prop="device_id"
               label="播放设备ID"
-            ></el-table-column>
-            <el-table-column
-              prop="content_id"
-              label="广告内容ID"
             ></el-table-column>
             <el-table-column
               prop="start_time"
@@ -167,7 +167,19 @@
         </div>
         <div v-if="activeIndex === '5'">
           <h2>播放日志</h2>
-          <el-table :data="playLogData" style="width: 100%">
+          <div style="display: flex; margin-bottom: 15px; align-items: center;">
+            <el-button type="primary" @click="handleAdd" style="margin-right: 15px">新增日志</el-button>
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索用户名/广告标题/设备名称"
+              style="width: 300px; margin-right: 10px;"
+              clearable
+              @keyup.enter.native="searchPlayLog"
+            ></el-input>
+            <el-button type="primary" @click="searchPlayLog">搜索</el-button>
+            <el-button v-if="isFiltered" @click="resetSearch">重置</el-button>
+          </div>
+          <el-table :data="filteredPlayLogData" style="width: 100%">
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
             <el-table-column prop="content_title" label="广告标题"></el-table-column>
@@ -191,11 +203,21 @@
 
     <el-dialog
       :title="
-        activeIndex === '1'
-          ? '编辑客户信息'
-          : activeIndex === '2'
-          ? '编辑设备信息'
-          : '编辑广告内容'
+        dialogType === 'add'
+          ? (activeIndex === '1'
+            ? '新增客户信息'
+            : activeIndex === '2'
+            ? '新增设备信息'
+            : activeIndex === '3'
+            ? '新增广告内容'
+            : '新增播放排期')
+          : (activeIndex === '1'
+            ? '编辑客户信息'
+            : activeIndex === '2'
+            ? '编辑设备信息'
+            : activeIndex === '3'
+            ? '编辑广告内容'
+            : '编辑播放排期')
       "
       :visible.sync="dialogVisible"
       width="50%"
@@ -219,6 +241,9 @@
             <el-option label="禁用" value="禁用"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="设备名称" v-if="activeIndex === '2'">
+          <el-input v-model="editForm.name"></el-input>
+        </el-form-item>
         <el-form-item label="安装位置" v-if="activeIndex === '2'">
           <el-input v-model="editForm.location"></el-input>
         </el-form-item>
@@ -239,10 +264,21 @@
           <el-input v-model="editForm.text"></el-input>
         </el-form-item>
         <el-form-item label="广告类型" v-if="activeIndex === '3'">
-          <el-select v-model="editForm.type" placeholder="请选择"></el-select>
+          <el-select v-model="editForm.type" placeholder="请选择">
             <el-option label="图片" value="图片"></el-option>
             <el-option label="视频" value="视频"></el-option>
             <el-option label="文字" value="文字"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="播放设备ID" v-if="activeIndex === '4'">
+          <el-select v-model="editForm.device_id" placeholder="请选择设备">
+            <el-option
+              v-for="item in deviceData"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id.toString()"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="播放开始时间" v-if="activeIndex === '4'">
           <el-date-picker
@@ -275,7 +311,47 @@
           </el-select>
         </el-form-item>
         <el-form-item label="价格" v-if="activeIndex === '4'">
-          <el-input-number v-model="editForm.price" :precision="2" :step="0.1" :min="0"></el-input-number>
+          <el-input-number v-model="editForm.price" :precision="2" :step="0.1" :min="0" :controls-position="'right'"></el-input-number>
+        </el-form-item>
+        <el-form-item label="用户ID" v-if="activeIndex === '5'">
+           <el-select v-model="editForm.user_id" placeholder="请选择用户">
+            <el-option
+              v-for="item in usersData"
+              :key="item.id"
+              :label="item.username"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="广告内容ID" v-if="activeIndex === '5'">
+          <el-select v-model="editForm.content_id" placeholder="请选择广告内容">
+            <el-option
+              v-for="item in contentData"
+              :key="item.id"
+              :label="item.title"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="设备ID" v-if="activeIndex === '5'">
+          <el-select v-model="editForm.device_id" placeholder="请选择设备">
+            <el-option
+              v-for="item in deviceData"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="排期ID" v-if="activeIndex === '5'">
+           <el-select v-model="editForm.schedule_id" placeholder="请选择排期">
+            <el-option
+              v-for="item in scheduleData"
+              :key="item.id"
+              :label="`设备:${item.device_id} 从 ${item.start_time} 到 ${item.end_time}`"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -298,28 +374,70 @@ export default {
       contentData: [],
       scheduleData: [],
       playLogData: [],
+      filteredPlayLogData: [],
+      searchKeyword: "",
+      isFiltered: false,
       dialogVisible: false,
+      dialogType: 'edit', // 'edit' 或 'add'
       editForm: {
         start_time: "",
         end_time: "",
         is_available: "是",
         price: 0,
+        user_id: null,
+        content_id: null,
+        device_id: null,
+        schedule_id: null,
       },
     };
   },
   mounted() {
     this.fetchData();
   },
+  watch: {
+    playLogData: {
+      immediate: true,
+      handler(val) {
+        this.filteredPlayLogData = val;
+      }
+    }
+  },
   methods: {
+    searchPlayLog() {
+      if (!this.searchKeyword.trim()) {
+        this.resetSearch();
+        return;
+      }
+      
+      const keyword = this.searchKeyword.toLowerCase();
+      this.filteredPlayLogData = this.playLogData.filter(item => {
+        return (
+          (item.username && item.username.toLowerCase().includes(keyword)) ||
+          (item.content_title && item.content_title.toLowerCase().includes(keyword)) ||
+          (item.device_name && item.device_name.toLowerCase().includes(keyword))
+        );
+      });
+      this.isFiltered = true;
+    },
+    resetSearch() {
+      this.searchKeyword = "";
+      this.filteredPlayLogData = this.playLogData;
+      this.isFiltered = false;
+    },
     async fetchData() {
       try {
+        let playLogUrl = "http://localhost:3030/api/play_log";
+        if (this.searchKeyword.trim()) {
+          playLogUrl += `?keyword=${encodeURIComponent(this.searchKeyword.trim())}`;
+        }
+        
         const [usersRes, devicesRes, contentsRes, scheduleRes, playLogRes] =
           await Promise.all([
             axios.get("http://localhost:3030/api/users"),
             axios.get("http://localhost:3030/api/device"),
             axios.get("http://localhost:3030/api/content"),
             axios.get("http://localhost:3030/api/schedule"),
-            axios.get("http://localhost:3030/api/play_log"),
+            axios.get(playLogUrl),
           ]);
 
         if (usersRes.data.code === 200) {
@@ -345,6 +463,7 @@ export default {
       this.activeIndex = key;
     },
     async handleEdit(row) {
+      this.dialogType = 'edit';
       this.editForm = JSON.parse(JSON.stringify(row));
       if (this.activeIndex === "4") {
         if (this.editForm.start_time) {
@@ -359,27 +478,32 @@ export default {
     async submitEdit() {
       try {
         let endpoint = "";
+        let method = this.dialogType === 'add' ? 'post' : 'put';
+        
         switch (this.activeIndex) {
           case "1":
-            endpoint = `/api/users/${this.editForm.id}`;
+            endpoint = this.dialogType === 'add' ? '/api/users' : `/api/users/${this.editForm.id}`;
             break;
           case "2":
-            endpoint = `/api/device/${this.editForm.id}`;
+            endpoint = this.dialogType === 'add' ? '/api/device' : `/api/device/${this.editForm.id}`;
             break;
           case "3":
-            endpoint = `/api/content/${this.editForm.id}`;
+            endpoint = this.dialogType === 'add' ? '/api/content' : `/api/content/${this.editForm.id}`;
             break;
           case "4":
-            endpoint = `/api/schedule/${this.editForm.id}`;
+            endpoint = this.dialogType === 'add' ? '/api/schedule' : `/api/schedule/${this.editForm.id}`;
+            break;
+          case "5":
+            endpoint = '/api/play_log';
             break;
         }
 
-        const response = await axios.put(
+        const response = await axios[method](
           `http://localhost:3030${endpoint}`,
           this.editForm
         );
         if (response.data.code === 200) {
-          this.$message.success("修改成功");
+          this.$message.success(response.data.message);
           this.dialogVisible = false;
           await this.fetchData();
         } else {
@@ -424,7 +548,54 @@ export default {
       }
     },
     async handleAdd() {
-      
+      this.dialogType = 'add';
+      // 根据不同的模块初始化表单数据
+      switch (this.activeIndex) {
+        case "1":
+          this.editForm = {
+            username: "",
+            password: "",
+            phone: "",
+            email: "",
+            status: "启用"
+          };
+          break;
+        case "2":
+          this.editForm = {
+            name: "",
+            location: "",
+            status: "online"
+          };
+          break;
+        case "3":
+          this.editForm = {
+            title: "",
+            file_url: "",
+            text: "",
+            type: "图片",
+            upload_time: new Date().toISOString()
+          };
+          break;
+        case "4":
+          this.editForm = {
+            device_id: "",
+            start_time: new Date(),
+            end_time: new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // 默认结束时间为当前时间+1天
+            play_mode: "定时",
+            is_available: "是",
+            price: 0
+          };
+          break;
+        case "5":
+          this.editForm = {
+            user_id: null,
+            content_id: null,
+            device_id: null,
+            schedule_id: null,
+          };
+          break;
+      }
+      this.dialogVisible = true;
     },
   },
 };
