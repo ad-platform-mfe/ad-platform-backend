@@ -1,28 +1,18 @@
 {
-  "name": "node_project",
+  "name": "ad-platform-backend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "start": "node index.js"
   },
   "dependencies": {
     "axios": "^1.9.0",
     "core-js": "^3.8.3",
     "cors": "^2.8.5",
-    "element-ui": "^2.15.14",
     "express": "^5.1.0",
     "mysql2": "^3.14.1",
-    "vue": "^2.6.14",
-    "vue-router": "^3.5.1",
-    "vuex": "^3.6.2"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-router": "~5.0.0",
-    "@vue/cli-plugin-vuex": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "vue-template-compiler": "^2.6.14"
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3"
   },
   "browserslist": [
     "> 1%",
