@@ -22,6 +22,15 @@ const User = sequelize.define('User', {
   },
   email: {
     type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
+  },
+  verification_code: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  code_expires_at: {
+    type: DataTypes.DATE,
     allowNull: true
   }
 }, {
