@@ -47,9 +47,9 @@
                   "properties": {
                     "code": {
                       "type": "integer",
-                      "example": 200
+                      "example": 0
                     },
-                    "message": {
+                    "msg": {
                       "type": "string",
                       "example": "注册成功"
                     }
@@ -96,17 +96,18 @@
                   "properties": {
                     "code": {
                       "type": "integer",
-                      "example": 200
+                      "example": 0
                     },
-                    "message": {
+                    "msg": {
                       "type": "string",
                       "example": "登录成功"
                     },
                     "data": {
                       "type": "object",
                       "properties": {
-                        "username": {
-                          "type": "string"
+                        "token": {
+                          "type": "string",
+                          "description": "JWT Token"
                         }
                       }
                     }
@@ -122,48 +123,17 @@
       "get": {
         "summary": "获取所有用户",
         "tags": ["用户管理"],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "成功获取用户列表",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer"
-                          },
-                          "username": {
-                            "type": "string"
-                          },
-                          "phone": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "成功获取用户列表"
           }
         }
       },
       "post": {
         "summary": "添加新用户",
         "tags": ["用户管理"],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -171,18 +141,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "phone": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  }
+                  "username": { "type": "string" },
+                  "password": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "email": { "type": "string" }
                 },
                 "required": ["username", "password", "phone", "email"]
               }
@@ -200,14 +162,13 @@
       "put": {
         "summary": "更新用户信息",
         "tags": ["用户管理"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "requestBody": {
@@ -217,18 +178,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "phone": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  }
+                  "username": { "type": "string" },
+                  "password": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "email": { "type": "string" }
                 },
                 "required": ["username", "password"]
               }
@@ -236,28 +189,23 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "更新成功"
-          }
+          "200": { "description": "更新成功" }
         }
       },
       "delete": {
         "summary": "删除用户",
         "tags": ["用户管理"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "删除成功"
-          }
+          "200": { "description": "删除成功" }
         }
       }
     },
@@ -369,15 +317,15 @@
       "get": {
         "summary": "获取所有广告内容",
         "tags": ["广告内容管理"],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "成功获取广告内容列表"
-          }
+          "200": { "description": "成功获取广告内容列表" }
         }
       },
       "post": {
         "summary": "添加新广告内容",
         "tags": ["广告内容管理"],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -385,22 +333,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "text": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "file_url": {
-                    "type": "string"
-                  },
-                  "upload_time": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
+                  "title": { "type": "string" },
+                  "text": { "type": "string" },
+                  "type": { "type": "string" },
+                  "file_url": { "type": "string" },
+                  "upload_time": { "type": "string", "format": "date-time" }
                 },
                 "required": ["title", "text", "type", "file_url", "upload_time"]
               }
@@ -408,9 +345,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "添加成功"
-          }
+          "200": { "description": "添加成功" }
         }
       }
     },
@@ -418,14 +353,13 @@
       "put": {
         "summary": "更新广告内容",
         "tags": ["广告内容管理"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "requestBody": {
@@ -435,22 +369,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "text": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "file_url": {
-                    "type": "string"
-                  },
-                  "upload_time": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
+                  "title": { "type": "string" },
+                  "text": { "type": "string" },
+                  "type": { "type": "string" },
+                  "file_url": { "type": "string" },
+                  "upload_time": { "type": "string", "format": "date-time" }
                 },
                 "required": ["title", "text", "type", "file_url", "upload_time"]
               }
@@ -458,28 +381,23 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "更新成功"
-          }
+          "200": { "description": "更新成功" }
         }
       },
       "delete": {
         "summary": "删除广告内容",
         "tags": ["广告内容管理"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "删除成功"
-          }
+          "200": { "description": "删除成功" }
         }
       }
     },
@@ -610,15 +528,15 @@
       "get": {
         "summary": "获取所有播放日志",
         "tags": ["播放日志管理"],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "成功获取播放日志列表"
-          }
+          "200": { "description": "成功获取播放日志列表" }
         }
       },
       "post": {
         "summary": "添加新播放日志",
         "tags": ["播放日志管理"],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -626,18 +544,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "user_id": {
-                    "type": "integer"
-                  },
-                  "content_id": {
-                    "type": "integer"
-                  },
-                  "device_id": {
-                    "type": "integer"
-                  },
-                  "schedule_id": {
-                    "type": "integer"
-                  }
+                  "user_id": { "type": "integer" },
+                  "content_id": { "type": "integer" },
+                  "device_id": { "type": "integer" },
+                  "schedule_id": { "type": "integer" }
                 },
                 "required": ["user_id", "content_id", "device_id", "schedule_id"]
               }
@@ -645,9 +555,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "添加成功"
-          }
+          "200": { "description": "添加成功" }
         }
       }
     },
@@ -655,36 +563,27 @@
       "delete": {
         "summary": "删除播放日志",
         "tags": ["播放日志管理"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "删除成功"
-          }
+          "200": { "description": "删除成功" }
         }
       }
     }
   },
   "components": {
-    "schemas": {
-      "Error": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

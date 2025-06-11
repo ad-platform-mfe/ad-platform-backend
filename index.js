@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const { initDatabase } = require('./models');
@@ -14,7 +16,7 @@ app.use('/api', apiRoutes);
 // 初始化数据库
 initDatabase();
 
-const PORT = 3030;
+const PORT = 9090;
 app.listen(PORT, () => {
   console.log(`服务器运行在端口 ${PORT}`);
 });
