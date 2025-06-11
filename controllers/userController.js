@@ -1,4 +1,6 @@
 const userService = require('../services/userService');
+const jwt = require('jsonwebtoken');
+const jwtConfig = require('../config/jwt');
 
 class UserController {
   // 用户注册
@@ -59,9 +61,16 @@ class UserController {
       const user = await userService.validateUser(username, password);
 
       if (user) {
+        // 用户验证成功，生成JWT
+        const token = jwt.sign(
+          { id: user.id, username: user.username },
+          jwtConfig.secretKey,
+          { expiresIn: jwtConfig.expiresIn }
+        );
+
         res.json({
           code: 0,
-          data: { username: user.username },
+          data: { token },
           msg: '登录成功'
         });
       } else {
