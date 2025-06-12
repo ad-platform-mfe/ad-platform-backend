@@ -1,4 +1,3 @@
-const userService = require('../services/userService');
 const mailService = require('../services/mailService');
 const { User } = require('../models');
 const jwt = require('jsonwebtoken');
@@ -115,6 +114,48 @@ class AuthController {
       res.status(500).json({ msg: '登录失败，请稍后重试' });
     }
   }
+
+  // 重置密码
+  async resetPassword(req, res) {
+    try {
+      const { email, code, password } = req.body;
+      if (!email || !code || !password) {
+        return res.status(400).json({ msg: '邮箱、验证码和新密码不能为空' });
+      }
+
+      // 1. 查找用户并验证验证码
+      const user = await User.findOne({
+        where: {
+          email,
+          verification_code: code,
+          code_expires_at: {
+            [Op.gt]: new Date()
+          }
+        }
+      });
+
+      // 2. 如果找不到用户或验证码无效
+      if (!user) {
+        return res.status(400).json({ msg: '验证码错误或已失效' });
+      }
+
+      // 3. 更新密码并清空验证码
+      await user.update({
+        password: password, // 注意：这里存储的是明文密码
+        verification_code: null,
+        code_expires_at: null
+      });
+
+      res.json({
+        code: 0,
+        msg: '密码重置成功'
+      });
+
+    } catch (error) {
+      console.error('重置密码错误:', error);
+      res.status(500).json({ msg: '密码重置失败，请稍后重试' });
+    }
+  }
 }
 
-module.exports = new AuthController(); 
+module.exports = new AuthController();

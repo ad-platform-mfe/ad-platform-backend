@@ -107,6 +107,95 @@
         }
       }
     },
+    "/api/auth/forgot-password": {
+      "post": {
+        "summary": "忘记密码 (请求验证码)",
+        "tags": ["认证管理"],
+        "description": "为已注册的邮箱发送一个用于重置密码的验证码。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "接收验证码的邮箱地址"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "如果该邮箱已注册，我们将发送一封密码重置邮件。" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "summary": "重置密码",
+        "tags": ["认证管理"],
+        "description": "使用有效的验证码为指定邮箱设置新密码。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "收到的4位数字验证码"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "要设置的新密码"
+                  }
+                },
+                "required": ["email", "code", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码重置成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "密码重置成功" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/register": {
       "post": {
         "summary": "用户注册 (传统方式)",

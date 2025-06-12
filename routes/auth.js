@@ -19,4 +19,10 @@ router.post('/code', codeLimiter, authController.sendVerificationCode);
 // POST /api/auth/login - 使用验证码登录
 router.post('/login', authController.loginWithCode);
 
+// POST /api/auth/forgot-password - 忘记密码，发送邮件
+router.post('/forgot-password', codeLimiter, authController.forgotPassword);
+
+// POST /api/auth/reset-password - 重置密码
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router; 
