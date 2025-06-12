@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
+const authRoutes = require('./auth');
 const userController = require('../controllers/userController');
 const contentController = require('../controllers/contentController');
 const playLogController = require('../controllers/playLogController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// 公开路由 - 用户注册和登录
+// --- 公开路由 ---
+// 认证相关
+router.use('/auth', authRoutes);
+// 用户注册和登录
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 

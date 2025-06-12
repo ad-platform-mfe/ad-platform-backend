@@ -14,8 +14,8 @@ const initDatabase = async () => {
     console.log('数据库连接成功');
 
     // 同步表结构
-    await sequelize.sync({ alter: true });
-    console.log('数据库表同步完成');
+    // await sequelize.sync({ alter: true });
+    // console.log('数据库表同步完成');
   } catch (error) {
     console.error('数据库连接失败:', error);
   }

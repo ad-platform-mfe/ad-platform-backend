@@ -4,7 +4,6 @@ const express = require('express');
 const cors = require('cors');
 const { initDatabase } = require('./models');
 const apiRoutes = require('./routes');
-const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -13,7 +12,6 @@ app.use(express.json());
 
 // 使用API路由
 app.use('/api', apiRoutes);
-app.use('/api/auth', authRoutes);
 
 // 初始化数据库
 initDatabase();
