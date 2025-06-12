@@ -15,4 +15,8 @@ const codeLimiter = rateLimit({
 // 定义路由
 // POST /api/auth/code - 发送验证码
 router.post('/code', codeLimiter, authController.sendVerificationCode);
+
+// POST /api/auth/login - 使用验证码登录
+router.post('/login', authController.loginWithCode);
+
 module.exports = router; 

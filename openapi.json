@@ -12,9 +12,104 @@
     }
   ],
   "paths": {
+    "/api/auth/code": {
+      "post": {
+        "summary": "请求邮箱验证码",
+        "tags": ["认证管理"],
+        "description": "向指定邮箱发送一个用于登录或注册的6位数字验证码。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "接收验证码的邮箱地址"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求成功，验证码已发送",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "验证码已发送至您的邮箱，请注意查收。" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "邮箱验证码登录/注册",
+        "tags": ["认证管理"],
+        "description": "使用邮箱和验证码进行登录。如果邮箱不存在，将自动创建新用户。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "登录的邮箱地址"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "收到的6位数字验证码"
+                  }
+                },
+                "required": ["email", "code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "登录成功" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "description": "JWT Token"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/register": {
       "post": {
-        "summary": "用户注册",
+        "summary": "用户注册 (传统方式)",
         "tags": ["用户管理"],
         "requestBody": {
           "required": true,
@@ -63,7 +158,7 @@
     },
     "/api/login": {
       "post": {
-        "summary": "用户登录",
+        "summary": "用户登录 (传统方式)",
         "tags": ["用户管理"],
         "requestBody": {
           "required": true,
