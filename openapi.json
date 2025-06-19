@@ -11,6 +11,28 @@
       "description": "开发服务器"
     }
   ],
+  "tags": [
+    {
+      "name": "认证管理",
+      "description": "用户认证、授权及密码管理"
+    },
+    {
+      "name": "用户管理",
+      "description": "用户的增删改查"
+    },
+    {
+      "name": "广告内容管理",
+      "description": "广告内容的增删改查"
+    },
+    {
+      "name": "播放日志管理",
+      "description": "播放日志的查询和删除"
+    },
+    {
+      "name": "埋点管理",
+      "description": "用户行为事件埋点"
+    }
+  ],
   "paths": {
     "/api/auth/code": {
       "post": {
@@ -299,6 +321,33 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "用户登出",
+        "tags": ["用户管理"],
+        "description": "用户登出。客户端在调用此接口后应立即销毁本地存储的JWT Token。",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "登出成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "登出成功" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "认证失败，未提供或Token无效"
           }
         }
       }
@@ -753,11 +802,56 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "description": "要删除的播放日志ID",
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "删除成功" }
+          "200": {
+            "description": "删除成功"
+          }
+        }
+      }
+    },
+    "/api/track": {
+      "post": {
+        "summary": "事件埋点",
+        "tags": ["埋点管理"],
+        "description": "上报一个用户行为事件，如页面浏览(view)或点击(click)。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "enum": ["view", "click"],
+                    "description": "事件类型"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "事件发生的页面URL"
+                  }
+                },
+                "required": ["event", "url"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "事件上报成功"
+          },
+          "400": {
+            "description": "请求参数错误"
+          },
+          "500": {
+            "description": "服务器内部错误"
+          }
         }
       }
     }

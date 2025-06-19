@@ -25,4 +25,24 @@ function authMiddleware(req, res, next) {
   }
 }
 
+// 可选认证中间件
+authMiddleware.optional = function (req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, jwtConfig.secretKey);
+    req.user = decoded;
+  } catch (error) {
+    // Token无效，但我们不希望请求失败，只是继续执行
+  }
+
+  next();
+};
+
 module.exports = authMiddleware;

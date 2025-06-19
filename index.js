@@ -7,6 +7,8 @@ const apiRoutes = require('./routes');
 
 const app = express();
 
+// 设置信任代理
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 

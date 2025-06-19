@@ -90,6 +90,14 @@ class UserController {
     }
   }
 
+  // 用户登出
+  async logout(req, res) {
+    res.json({
+      code: 0,
+      msg: '登出成功'
+    });
+  }
+
   // 获取所有用户
   async getAllUsers(req, res) {
     try {
