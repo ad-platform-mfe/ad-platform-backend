@@ -31,6 +31,10 @@
     {
       "name": "埋点管理",
       "description": "用户行为事件埋点"
+    },
+    {
+      "name": "素材管理",
+      "description": "上传和管理图片素材（Base64）"
     }
   ],
   "paths": {
@@ -886,6 +890,96 @@
           "500": {
             "description": "服务器内部错误"
           }
+        }
+      }
+    },
+    "/api/materials": {
+      "post": {
+        "summary": "上传新素材",
+        "tags": ["素材管理"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "description": "素材标题" },
+                  "data": { "type": "string", "description": "素材的Base64编码" }
+                },
+                "required": ["title", "data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "创建成功" },
+          "400": { "description": "请求参数错误" }
+        }
+      },
+      "get": {
+        "summary": "获取素材列表",
+        "tags": ["素材管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 }},
+          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 10 }}
+        ],
+        "responses": {
+          "200": { "description": "获取成功" }
+        }
+      }
+    },
+    "/api/materials/{id}": {
+      "get": {
+        "summary": "获取单个素材详情",
+        "tags": ["素材管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "获取成功" },
+          "404": { "description": "素材不存在" }
+        }
+      },
+      "put": {
+        "summary": "更新素材标题",
+        "tags": ["素材管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "description": "新的素材标题" }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "更新成功" },
+          "404": { "description": "素材不存在" }
+        }
+      },
+      "delete": {
+        "summary": "删除素材",
+        "tags": ["素材管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功" },
+          "404": { "description": "素材不存在" }
         }
       }
     }

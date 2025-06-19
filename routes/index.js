@@ -3,6 +3,7 @@ const router = express.Router();
 
 const authRoutes = require('./auth');
 const trackingRoutes = require('./tracking');
+const materialRoutes = require('./material');
 const userController = require('../controllers/userController');
 const contentController = require('../controllers/contentController');
 const playLogController = require('../controllers/playLogController');
@@ -21,6 +22,9 @@ router.post('/login', userController.login);
 
 // --- 以下所有路由都需要认证 ---
 router.use(authMiddleware);
+
+// 素材管理
+router.use('/materials', materialRoutes);
 
 // 用户登出
 router.post('/logout', userController.logout);

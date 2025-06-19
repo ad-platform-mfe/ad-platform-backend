@@ -3,6 +3,7 @@ const User = require('./User');
 const Content = require('./Content');
 const PlayLog = require('./PlayLog');
 const Tracking = require('./Tracking');
+const Material = require('./Material');
 
 // 定义模型关联关系
 PlayLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
@@ -27,5 +28,6 @@ module.exports = {
   Content,
   PlayLog,
   Tracking,
+  Material,
   initDatabase
 }; 
