@@ -31,6 +31,16 @@ class TrackingController {
       res.status(500).json({ message: '事件跟踪出错', error: error.message });
     }
   }
+
+  async getTrackingEvents(req, res) {
+    try {
+      const { page, pageSize } = req.query;
+      const data = await trackingService.getTrackingEvents({ page, pageSize });
+      res.json({ code: 0, msg: '获取成功', data });
+    } catch (error) {
+      res.status(500).json({ message: '获取跟踪事件列表出错', error: error.message });
+    }
+  }
 }
 
 module.exports = new TrackingController(); 

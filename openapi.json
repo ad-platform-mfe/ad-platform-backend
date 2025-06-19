@@ -816,6 +816,40 @@
       }
     },
     "/api/track": {
+      "get": {
+        "summary": "获取埋点数据列表",
+        "tags": ["埋点管理"],
+        "description": "分页获取所有用户的行为事件埋点数据。需要管理员权限。",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码，从1开始",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每页数量",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取埋点数据"
+          },
+          "401": {
+            "description": "认证失败"
+          }
+        }
+      },
       "post": {
         "summary": "事件埋点",
         "tags": ["埋点管理"],
