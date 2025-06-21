@@ -4,12 +4,18 @@ class MaterialController {
   // 创建素材
   async createMaterial(req, res) {
     try {
-      const { title, data } = req.body;
+      const { title, type, data, cover } = req.body;
       const user_id = req.user.id;
-      if (!title || !data) {
-        return res.status(400).json({ message: '标题和素材数据不能为空' });
+      if (!title || !data || !type) {
+        return res.status(400).json({ message: '标题、数据和类型均不能为空' });
       }
-      const material = await materialService.createMaterial({ title, data, user_id });
+      const material = await materialService.createMaterial({
+        title,
+        type,
+        data,
+        cover,
+        user_id: user_id
+      });
       res.status(201).json({ code: 0, msg: '创建成功', data: material });
     } catch (error) {
       res.status(500).json({ message: '创建素材失败', error: error.message });

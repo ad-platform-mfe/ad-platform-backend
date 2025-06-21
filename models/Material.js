@@ -14,15 +14,27 @@ const Material = sequelize.define('Material', {
     comment: '素材标题'
   },
   type: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('image', 'video'),
     allowNull: false,
-    defaultValue: 'image',
-    comment: '素材类型, 目前固定为 image'
+    comment: '素材类型, 例如: image, video'
   },
   data: {
     type: DataTypes.TEXT('long'),
     allowNull: false,
     comment: '素材的Base64编码'
+  },
+  cover: {
+    type: DataTypes.TEXT('long'),
+    allowNull: true
+  },
+  reviewStatus: {
+    type: DataTypes.ENUM('pending', 'approved', 'rejected', 'review'),
+    defaultValue: 'pending',
+    allowNull: false
+  },
+  reviewResult: {
+    type: DataTypes.JSON,
+    allowNull: true
   },
   user_id: {
     type: DataTypes.INTEGER,

@@ -8,6 +8,7 @@ const userController = require('../controllers/userController');
 const contentController = require('../controllers/contentController');
 const playLogController = require('../controllers/playLogController');
 const authMiddleware = require('../middleware/authMiddleware');
+const reviewRoutes = require('./review');
 
 // --- 公开路由 ---
 // 认证相关
@@ -45,5 +46,8 @@ router.delete('/content/:id', contentController.deleteContent);
 router.get('/play_log', playLogController.getAllPlayLogs);
 router.post('/play_log', playLogController.createPlayLog);
 router.delete('/play_log/:id', playLogController.deletePlayLog);
+
+// 审核相关路由
+router.use('/reviews', reviewRoutes);
 
 module.exports = router; 
