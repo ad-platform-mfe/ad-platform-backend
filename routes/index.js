@@ -24,6 +24,9 @@ router.post('/login', userController.login);
 // --- 以下所有路由都需要认证 ---
 router.use(authMiddleware);
 
+// 素材审核
+router.use('/reviews', reviewRoutes);
+
 // 素材管理
 router.use('/materials', materialRoutes);
 
@@ -46,8 +49,5 @@ router.delete('/content/:id', contentController.deleteContent);
 router.get('/play_log', playLogController.getAllPlayLogs);
 router.post('/play_log', playLogController.createPlayLog);
 router.delete('/play_log/:id', playLogController.deletePlayLog);
-
-// 审核相关路由
-router.use('/reviews', reviewRoutes);
 
 module.exports = router; 

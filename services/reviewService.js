@@ -52,12 +52,40 @@ class ReviewService {
         reviewResult: response, // 存储完整的返回结果
       });
 
-      return { materialId, reviewStatus, details: response };
+      return { success: true, materialId, reviewStatus, details: response };
 
     } catch (err) {
       console.error("腾讯云审核API调用失败", err);
-      throw new Error('AI审核服务调用失败');
+      // 返回一个包含具体错误信息的对象
+      return {
+        success: false,
+        error: {
+          message: err.message,
+          code: err.code,
+          requestId: err.requestId
+        }
+      };
     }
+  }
+
+  /**
+   * 提交人工审核结果
+   * @param {number} materialId - 素材ID
+   * @param {object} reviewData - 审核数据
+   * @param {'approved' | 'rejected'} reviewData.reviewStatus - 审核结果
+   * @param {string} [reviewData.reason] - 人工审核的原因
+   */
+  async submitManualReview(materialId, reviewData) {
+    const material = await Material.findByPk(materialId);
+    if (!material) {
+      return null;
+    }
+
+    // 更新状态和原因
+    return await material.update({
+      reviewStatus: reviewData.reviewStatus,
+      manualReviewReason: reviewData.reason || null,
+    });
   }
 }
 

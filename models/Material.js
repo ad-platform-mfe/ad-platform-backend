@@ -27,19 +27,26 @@ const Material = sequelize.define('Material', {
     type: DataTypes.TEXT('long'),
     allowNull: true
   },
-  reviewStatus: {
-    type: DataTypes.ENUM('pending', 'approved', 'rejected', 'review'),
-    defaultValue: 'pending',
-    allowNull: false
-  },
-  reviewResult: {
-    type: DataTypes.JSON,
-    allowNull: true
-  },
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     comment: '上传用户的ID'
+  },
+  reviewStatus: {
+    type: DataTypes.ENUM('pending', 'approved', 'rejected', 'review'),
+    defaultValue: 'pending',
+    allowNull: false,
+    comment: '审核状态'
+  },
+  reviewResult: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: '机审结果的完整JSON响应'
+  },
+  manualReviewReason: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: '人工审核不通过的原因'
   }
 }, {
   tableName: 'materials',
