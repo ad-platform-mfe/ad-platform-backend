@@ -8,6 +8,7 @@ const userController = require('../controllers/userController');
 const contentController = require('../controllers/contentController');
 const playLogController = require('../controllers/playLogController');
 const authMiddleware = require('../middleware/authMiddleware');
+const adminOnly = require('../middleware/adminOnly');
 const reviewRoutes = require('./review');
 
 // --- 公开路由 ---
@@ -38,6 +39,8 @@ router.get('/users', userController.getAllUsers);
 router.post('/users', userController.createUser);
 router.put('/users/:id', userController.updateUser);
 router.delete('/users/:id', userController.deleteUser);
+// (Admin only) 更新用户角色
+router.put('/users/:id/role', adminOnly, userController.updateUserRole);
 
 // 广告内容相关路由
 router.get('/content', contentController.getAllContents);

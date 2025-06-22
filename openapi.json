@@ -464,6 +464,67 @@
         }
       }
     },
+    "/api/users/{id}/role": {
+      "put": {
+        "summary": "更新用户角色 (管理员)",
+        "tags": [
+          "用户管理"
+        ],
+        "description": "更新指定用户的角色。此接口仅限管理员访问。",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "advertisers",
+                      "admin"
+                    ],
+                    "description": "新的角色"
+                  }
+                },
+                "required": [
+                  "role"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功"
+          },
+          "400": {
+            "description": "请求参数错误（无效的角色）"
+          },
+          "403": {
+            "description": "没有管理员权限"
+          },
+          "404": {
+            "description": "用户不存在"
+          }
+        }
+      }
+    },
     "/api/device": {
       "get": {
         "summary": "获取所有设备",

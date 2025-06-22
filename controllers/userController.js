@@ -252,6 +252,29 @@ class UserController {
       });
     }
   }
+
+  // 更新用户角色
+  async updateUserRole(req, res) {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+
+      if (!role || !['advertisers', 'admin'].includes(role)) {
+        return res.status(400).json({ code: 400, msg: '无效的角色' });
+      }
+
+      const success = await userService.updateUserRole(id, role);
+
+      if (success) {
+        res.json({ code: 0, msg: '更新用户角色成功' });
+      } else {
+        res.status(404).json({ code: 404, msg: '用户不存在' });
+      }
+    } catch (error) {
+      console.error('更新用户角色错误:', error);
+      res.status(500).json({ code: 500, msg: '更新用户角色失败' });
+    }
+  }
 }
 
 module.exports = new UserController(); 

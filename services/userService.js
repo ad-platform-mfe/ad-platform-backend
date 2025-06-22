@@ -54,6 +54,14 @@ class UserService {
     });
     return !!user;
   }
+
+  // 更新用户角色
+  async updateUserRole(id, role) {
+    const [updatedRowsCount] = await User.update({ role }, {
+      where: { id }
+    });
+    return updatedRowsCount > 0;
+  }
 }
 
 module.exports = new UserService(); 
