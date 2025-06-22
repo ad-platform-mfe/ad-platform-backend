@@ -63,7 +63,7 @@ class UserController {
       if (user) {
         // 用户验证成功，生成JWT
         const token = jwt.sign(
-          { id: user.id, username: user.username },
+          { id: user.id, username: user.username, role: user.role },
           jwtConfig.secretKey,
           { expiresIn: jwtConfig.expiresIn }
         );
@@ -96,6 +96,27 @@ class UserController {
       code: 0,
       msg: '登出成功'
     });
+  }
+
+  // 获取当前登录用户的信息
+  async getMe(req, res) {
+    // authMiddleware 确保了 req.user 的存在
+    const userId = req.user.id;
+    try {
+      const user = await userService.getUserById(userId);
+      if (user) {
+        const { id, username, email, phone, role } = user;
+        res.json({
+          code: 0,
+          data: { id, username, email, phone, role },
+          msg: '获取用户信息成功'
+        });
+      } else {
+        res.status(404).json({ code: 404, msg: '用户不存在' });
+      }
+    } catch (error) {
+      res.status(500).json({ code: 500, msg: '获取用户信息失败' });
+    }
   }
 
   // 获取所有用户

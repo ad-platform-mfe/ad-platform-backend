@@ -31,6 +31,12 @@ const User = sequelize.define('User', {
   code_expires_at: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  role: {
+    type: DataTypes.ENUM('advertisers', 'admin'),
+    allowNull: false,
+    defaultValue: 'advertisers',
+    comment: '用户角色'
   }
 }, {
   tableName: 'users',

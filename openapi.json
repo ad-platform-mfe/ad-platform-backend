@@ -222,6 +222,19 @@
         }
       }
     },
+    "/api/auth/me": {
+      "get": {
+        "summary": "获取当前用户信息",
+        "tags": ["认证管理"],
+        "description": "获取当前已登录用户的信息，包括角色。",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "获取成功" },
+          "401": { "description": "未认证" },
+          "404": { "description": "用户在数据库中不存在" }
+        }
+      }
+    },
     "/api/register": {
       "post": {
         "summary": "用户注册 (传统方式)",
@@ -267,7 +280,12 @@
                 }
               }
             }
-          }
+          },
+          "202": { "description": "审核任务已启动" },
+          "401": { "description": "未认证" },
+          "403": { "description": "没有管理员权限" },
+          "404": { "description": "素材不存在" },
+          "500": { "description": "AI服务调用失败" }
         }
       }
     },
@@ -979,6 +997,29 @@
         ],
         "responses": {
           "200": { "description": "删除成功" },
+          "404": { "description": "素材不存在" }
+        }
+      }
+    },
+    "/api/reviews/manual/{id}": {
+      "get": {
+        "summary": "获取审核结果",
+        "tags": ["审核管理"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "审核成功" },
+          "401": { "description": "未认证" },
+          "403": { "description": "没有管理员权限" },
+          "400": { "description": "请求参数错误" },
           "404": { "description": "素材不存在" }
         }
       }

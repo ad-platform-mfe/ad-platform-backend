@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { rateLimit } = require('express-rate-limit');
 const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // 对发送验证码接口进行频率限制
 const codeLimiter = rateLimit({
@@ -24,5 +26,8 @@ router.post('/forgot-password', codeLimiter, authController.forgotPassword);
 
 // POST /api/auth/reset-password - 重置密码
 router.post('/reset-password', authController.resetPassword);
+
+// GET /api/auth/me - 获取当前用户信息 (需要认证)
+router.get('/me', authMiddleware, userController.getMe);
 
 module.exports = router; 
