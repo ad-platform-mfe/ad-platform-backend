@@ -1071,9 +1071,9 @@
       }
     },
     "/api/reviews/manual/{id}": {
-      "get": {
-        "summary": "获取审核结果",
-        "tags": ["审核管理"],
+      "post": {
+        "tags": ["Review"],
+        "summary": "手动审核内容",
         "parameters": [
           {
             "name": "id",
@@ -1093,70 +1093,102 @@
         }
       }
     },
-    "/api/ad-groups": {
+    "/api/adGroup/create": {
       "post": {
+        "tags": ["AdGroup"],
         "summary": "创建新广告组",
-        "tags": ["广告组管理"],
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": {
-            "type": "object",
-            "properties": {
-              "name": { "type": "string" },
-              "mainCategory": { "type": "string", "enum": ["互动广告", "创意视频"] },
-              "tags": { "type": "array", "items": { "type": "string" } },
-              "materialIds": { "type": "array", "items": { "type": "integer" }, "description": "要关联的素材ID数组" }
-            },
-            "required": ["name", "mainCategory"]
-          }}}
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "夏季促销广告" },
+                  "mainCategory": { "type": "string", "enum": ["互动广告", "创意视频"] },
+                  "tags": { "type": "array", "items": { "type": "string" }, "example": ["新品", "折扣"] },
+                  "materialIds": { "type": "array", "items": { "type": "integer" }, "example": [1, 2, 3] }
+                },
+                "required": ["name", "mainCategory"]
+              }
+            }
+          }
         },
-        "responses": { "201": { "description": "创建成功" } }
-      },
-      "get": {
-        "summary": "获取广告组列表",
-        "tags": ["广告组管理"],
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 10 } }
-        ],
-        "responses": { "200": { "description": "获取成功" } }
+        "responses": {
+          "201": { "description": "创建成功" },
+          "500": { "description": "服务器错误" }
+        }
       }
     },
-    "/api/ad-groups/{id}": {
+    "/api/adGroup/list": {
       "get": {
+        "tags": ["AdGroup"],
+        "summary": "获取广告组列表",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "page", "schema": { "type": "integer", "default": 1 } },
+          { "in": "query", "name": "pageSize", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "获取成功" },
+          "500": { "description": "服务器错误" }
+        }
+      }
+    },
+    "/api/adGroup/detail/{id}": {
+      "get": {
+        "tags": ["AdGroup"],
         "summary": "获取单个广告组详情",
-        "tags": ["广告组管理"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
-        "responses": { "200": { "description": "获取成功" }, "404": { "description": "广告组不存在" } }
-      },
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "获取成功" },
+          "404": { "description": "未找到" },
+          "500": { "description": "服务器错误" }
+        }
+      }
+    },
+    "/api/adGroup/update/{id}": {
       "put": {
+        "tags": ["AdGroup"],
         "summary": "更新广告组",
-        "tags": ["广告组管理"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": {
-            "type": "object",
-            "properties": {
-              "name": { "type": "string" },
-              "mainCategory": { "type": "string", "enum": ["互动广告", "创意视频"] },
-              "tags": { "type": "array", "items": { "type": "string" } },
-              "materialIds": { "type": "array", "items": { "type": "integer" }, "description": "要关联的素材ID数组" }
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "mainCategory": { "type": "string", "enum": ["互动广告", "创意视频"] },
+                  "tags": { "type": "array", "items": { "type": "string" } },
+                  "materialIds": { "type": "array", "items": { "type": "integer" } }
+                }
+              }
             }
-          }}}
+          }
         },
-        "responses": { "200": { "description": "更新成功" }, "404": { "description": "广告组不存在" } }
-      },
+        "responses": {
+          "200": { "description": "更新成功" },
+          "404": { "description": "未找到" },
+          "500": { "description": "服务器错误" }
+        }
+      }
+    },
+    "/api/adGroup/delete/{id}": {
       "delete": {
+        "tags": ["AdGroup"],
         "summary": "删除广告组",
-        "tags": ["广告组管理"],
         "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
-        "responses": { "200": { "description": "删除成功" }, "404": { "description": "广告组不存在" } }
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "删除成功" },
+          "404": { "description": "未找到" },
+          "500": { "description": "服务器错误" }
+        }
       }
     }
   },

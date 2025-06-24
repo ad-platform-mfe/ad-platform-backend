@@ -30,7 +30,7 @@ router.use(authMiddleware);
 router.use('/reviews', reviewRoutes);
 
 // 广告组管理
-router.use('/ad-groups', adGroupRoutes);
+router.use('/adGroup', adGroupRoutes);
 
 // 素材管理
 router.use('/materials', materialRoutes);
