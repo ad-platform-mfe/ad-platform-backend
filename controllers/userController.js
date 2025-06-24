@@ -188,17 +188,23 @@ class UserController {
   async updateUser(req, res) {
     try {
       const { id } = req.params;
-      const { username, password, phone, email } = req.body;
+      const { username, password, phone, email, role } = req.body;
 
-      if (!username || !password) {
+      if (!username) {
         return res.json({
-          code: 500,
+          code: 400,
           data: null,
-          msg: '必填字段不能为空'
+          msg: '用户名不能为空'
         });
       }
 
-      const success = await userService.updateUser(id, { username, password, phone, email });
+      const updateData = { username, phone, email, role };
+      // 只有当传入 password 且不为空时，才更新密码
+      if (password) {
+        updateData.password = password;
+      }
+
+      const success = await userService.updateUser(id, updateData);
 
       if (success) {
         res.json({

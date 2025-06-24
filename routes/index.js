@@ -10,6 +10,7 @@ const playLogController = require('../controllers/playLogController');
 const authMiddleware = require('../middleware/authMiddleware');
 const adminOnly = require('../middleware/adminOnly');
 const reviewRoutes = require('./review');
+const adGroupRoutes = require('./adGroup');
 
 // --- 公开路由 ---
 // 认证相关
@@ -27,6 +28,9 @@ router.use(authMiddleware);
 
 // 素材审核
 router.use('/reviews', reviewRoutes);
+
+// 广告组管理
+router.use('/ad-groups', adGroupRoutes);
 
 // 素材管理
 router.use('/materials', materialRoutes);

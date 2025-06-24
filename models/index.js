@@ -4,10 +4,24 @@ const Content = require('./Content');
 const PlayLog = require('./PlayLog');
 const Tracking = require('./Tracking');
 const Material = require('./Material');
+const AdGroup = require('./AdGroup');
+const AdGroupMaterial = require('./AdGroupMaterial');
 
 // 定义模型关联关系
 PlayLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 PlayLog.belongsTo(Content, { foreignKey: 'content_id', as: 'content' });
+
+// AdGroup 和 Material 的多对多关系
+AdGroup.belongsToMany(Material, {
+  through: AdGroupMaterial,
+  foreignKey: 'ad_group_id',
+  otherKey: 'material_id',
+});
+Material.belongsToMany(AdGroup, {
+  through: AdGroupMaterial,
+  foreignKey: 'material_id',
+  otherKey: 'ad_group_id',
+});
 
 // 初始化数据库
 const initDatabase = async () => {
@@ -29,5 +43,7 @@ module.exports = {
   PlayLog,
   Tracking,
   Material,
+  AdGroup,
+  AdGroupMaterial,
   initDatabase
 }; 

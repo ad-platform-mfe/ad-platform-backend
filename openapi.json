@@ -35,6 +35,14 @@
     {
       "name": "素材管理",
       "description": "上传和管理图片素材（Base64）"
+    },
+    {
+      "name": "审核管理",
+      "description": "素材的机器审核与人工审核"
+    },
+    {
+      "name": "广告组管理",
+      "description": "管理广告组及其关联的素材"
     }
   ],
   "paths": {
@@ -1083,6 +1091,72 @@
           "400": { "description": "请求参数错误" },
           "404": { "description": "素材不存在" }
         }
+      }
+    },
+    "/api/ad-groups": {
+      "post": {
+        "summary": "创建新广告组",
+        "tags": ["广告组管理"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "mainCategory": { "type": "string", "enum": ["互动广告", "创意视频"] },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "materialIds": { "type": "array", "items": { "type": "integer" }, "description": "要关联的素材ID数组" }
+            },
+            "required": ["name", "mainCategory"]
+          }}}
+        },
+        "responses": { "201": { "description": "创建成功" } }
+      },
+      "get": {
+        "summary": "获取广告组列表",
+        "tags": ["广告组管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": { "200": { "description": "获取成功" } }
+      }
+    },
+    "/api/ad-groups/{id}": {
+      "get": {
+        "summary": "获取单个广告组详情",
+        "tags": ["广告组管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "获取成功" }, "404": { "description": "广告组不存在" } }
+      },
+      "put": {
+        "summary": "更新广告组",
+        "tags": ["广告组管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "mainCategory": { "type": "string", "enum": ["互动广告", "创意视频"] },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "materialIds": { "type": "array", "items": { "type": "integer" }, "description": "要关联的素材ID数组" }
+            }
+          }}}
+        },
+        "responses": { "200": { "description": "更新成功" }, "404": { "description": "广告组不存在" } }
+      },
+      "delete": {
+        "summary": "删除广告组",
+        "tags": ["广告组管理"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "删除成功" }, "404": { "description": "广告组不存在" } }
       }
     }
   },
