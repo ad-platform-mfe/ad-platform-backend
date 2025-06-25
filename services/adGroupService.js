@@ -1,4 +1,5 @@
 const { AdGroup, Material } = require('../models');
+const { Op } = require('sequelize');
 
 class AdGroupService {
   /**
@@ -7,7 +8,14 @@ class AdGroupService {
   async createAdGroup(data, materialIds = []) {
     const adGroup = await AdGroup.create(data);
     if (materialIds && materialIds.length > 0) {
-      await adGroup.setMaterials(materialIds);
+      const approvedMaterials = await Material.findAll({
+        where: {
+          id: { [Op.in]: materialIds },
+          reviewStatus: 'approved'
+        }
+      });
+      const approvedMaterialIds = approvedMaterials.map((m) => m.id);
+      await adGroup.setMaterials(approvedMaterialIds);
     }
     return adGroup;
   }
@@ -46,7 +54,18 @@ class AdGroupService {
     await adGroup.update(updateData);
     // 如果提供了 materialIds，则更新关联关系
     if (materialIds) {
-      await adGroup.setMaterials(materialIds);
+      if (materialIds.length > 0) {
+        const approvedMaterials = await Material.findAll({
+          where: {
+            id: { [Op.in]: materialIds },
+            reviewStatus: 'approved'
+          }
+        });
+        const approvedMaterialIds = approvedMaterials.map((m) => m.id);
+        await adGroup.setMaterials(approvedMaterialIds);
+      } else {
+        await adGroup.setMaterials([]); // 如果传入空数组，则清空所有关联
+      }
     }
     return await this.getAdGroupById(id); // 返回更新后的完整数据
   }
