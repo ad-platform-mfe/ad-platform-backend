@@ -1,4 +1,4 @@
-const { AdGroup, Material } = require('../models');
+const { AdGroup, Material, User } = require('../models');
 const { Op } = require('sequelize');
 
 class AdGroupService {
@@ -29,7 +29,13 @@ class AdGroupService {
       offset,
       limit: parseInt(pageSize, 10),
       order: [['createdAt', 'DESC']],
-      include: [{ model: Material, as: 'Materials' }] // 使用别名加载关联的素材
+      include: [
+        {
+          model: Material,
+          as: 'Materials',
+          include: [{ model: User, as: 'user', attributes: ['id', 'username'] }]
+        }
+      ]
     });
   }
 
@@ -38,7 +44,13 @@ class AdGroupService {
    */
   async getAdGroupById(id) {
     return await AdGroup.findByPk(id, {
-      include: [{ model: Material, as: 'Materials' }] // 使用别名加载关联的素材
+      include: [
+        {
+          model: Material,
+          as: 'Materials',
+          include: [{ model: User, as: 'user', attributes: ['id', 'username'] }]
+        }
+      ]
     });
   }
 

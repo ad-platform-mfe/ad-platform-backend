@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User');
 
 const Material = sequelize.define('Material', {
   id: {
@@ -53,8 +52,5 @@ const Material = sequelize.define('Material', {
   timestamps: true,
   comment: '素材表'
 });
-
-Material.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(Material, { foreignKey: 'user_id' });
 
 module.exports = Material; 

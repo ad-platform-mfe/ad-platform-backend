@@ -13,6 +13,7 @@ const reviewRoutes = require('./review');
 const adGroupRoutes = require('./adGroup');
 const dashboardRoutes = require('./dashboard');
 const adGroupController = require('../controllers/adGroupController');
+const commentRoutes = require('./comment');
 
 // --- 公开路由 ---
 // 认证相关
@@ -64,5 +65,8 @@ router.delete('/play_log/:id', playLogController.deletePlayLog);
 
 // dashboard路由
 router.use('/dashboard', dashboardRoutes);
+
+// 评论相关路由
+router.use('/comments', commentRoutes);
 
 module.exports = router; 

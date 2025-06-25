@@ -1,51 +1,59 @@
 const sequelize = require('../config/database');
 const User = require('./User');
-const Content = require('./Content');
-const PlayLog = require('./PlayLog');
-const Tracking = require('./Tracking');
 const Material = require('./Material');
 const AdGroup = require('./AdGroup');
 const AdGroupMaterial = require('./AdGroupMaterial');
+const PlayLog = require('./PlayLog');
+const Tracking = require('./Tracking');
+const Favorite = require('./Favorite');
+const Comment = require('./Comment');
 
-// 定义模型关联关系
-PlayLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-PlayLog.belongsTo(Content, { foreignKey: 'content_id', as: 'content' });
+// 定义模型之间的关系
+// User-Material (one-to-many)
+User.hasMany(Material, { foreignKey: 'user_id' });
+Material.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
-// AdGroup 和 Material 的多对多关系
-AdGroup.belongsToMany(Material, {
-  through: AdGroupMaterial,
-  foreignKey: 'ad_group_id',
-  otherKey: 'material_id',
-  as: 'Materials',
-});
-Material.belongsToMany(AdGroup, {
-  through: AdGroupMaterial,
-  foreignKey: 'material_id',
-  otherKey: 'ad_group_id',
-  as: 'AdGroups',
-});
+// Material-AdGroup (many-to-many)
+Material.belongsToMany(AdGroup, { through: AdGroupMaterial, foreignKey: 'material_id' });
+AdGroup.belongsToMany(Material, { through: AdGroupMaterial, foreignKey: 'ad_group_id', as: 'Materials' });
+
+// User-AdGroup (one-to-many)
+User.hasMany(AdGroup, { foreignKey: 'user_id' });
+AdGroup.belongsTo(User, { foreignKey: 'user_id' });
+
+// Favorite: User-Material (many-to-many)
+User.belongsToMany(Material, { through: Favorite, as: 'FavoritedMaterials', foreignKey: 'userId' });
+Material.belongsToMany(User, { through: Favorite, as: 'FavoritingUsers', foreignKey: 'materialId' });
+
+// Comment: User-Material (one-to-many, a user can have many comments on a material)
+User.hasMany(Comment, { foreignKey: 'userId' });
+Comment.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Material.hasMany(Comment, { foreignKey: 'materialId' });
+Comment.belongsTo(Material, { foreignKey: 'materialId' });
+
+// Comment self-association for replies
+Comment.hasMany(Comment, { as: 'Replies', foreignKey: 'parentId', useJunctionTable: false });
+Comment.belongsTo(Comment, { as: 'Parent', foreignKey: 'parentId' });
 
 // 初始化数据库
 const initDatabase = async () => {
   try {
-    await sequelize.authenticate();
-    console.log('数据库连接成功');
-
-    // 同步表结构
-    // await sequelize.sync({ alter: true });
-    // console.log('数据库表同步完成');
+    await sequelize.sync({ alter: true });
+    console.log('数据库同步成功');
   } catch (error) {
-    console.error('数据库连接失败:', error);
+    console.error('数据库同步失败:', error);
   }
 };
 
 module.exports = {
+  sequelize,
+  initDatabase,
   User,
-  Content,
-  PlayLog,
-  Tracking,
   Material,
   AdGroup,
-  AdGroupMaterial,
-  initDatabase
+  PlayLog,
+  Tracking,
+  Favorite,
+  Comment
 }; 
