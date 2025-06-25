@@ -12,6 +12,7 @@ const adminOnly = require('../middleware/adminOnly');
 const reviewRoutes = require('./review');
 const adGroupRoutes = require('./adGroup');
 const dashboardRoutes = require('./dashboard');
+const adGroupController = require('../controllers/adGroupController');
 
 // --- 公开路由 ---
 // 认证相关
@@ -24,14 +25,17 @@ router.use('/track', trackingRoutes);
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 
-// --- 以下所有路由都需要认证 ---
+// 获取广告组列表
+router.get('/adGroup/list', adGroupController.list);
+
+// --- 路由认证 ---
 router.use(authMiddleware);
+
+// 广告组管理路由
+router.use('/adGroup', adGroupRoutes);
 
 // 素材审核
 router.use('/reviews', reviewRoutes);
-
-// 广告组管理
-router.use('/adGroup', adGroupRoutes);
 
 // 素材管理
 router.use('/materials', materialRoutes);
@@ -58,7 +62,7 @@ router.get('/play_log', playLogController.getAllPlayLogs);
 router.post('/play_log', playLogController.createPlayLog);
 router.delete('/play_log/:id', playLogController.deletePlayLog);
 
-// 新增的dashboard路由
+// dashboard路由
 router.use('/dashboard', dashboardRoutes);
 
 module.exports = router; 

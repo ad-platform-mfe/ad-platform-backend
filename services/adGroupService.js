@@ -21,7 +21,7 @@ class AdGroupService {
       offset,
       limit: parseInt(pageSize, 10),
       order: [['createdAt', 'DESC']],
-      include: [Material] // 同时加载关联的素材
+      include: [{ model: Material, as: 'Materials' }] // 使用别名加载关联的素材
     });
   }
 
@@ -30,7 +30,7 @@ class AdGroupService {
    */
   async getAdGroupById(id) {
     return await AdGroup.findByPk(id, {
-      include: [Material] // 同时加载关联的素材
+      include: [{ model: Material, as: 'Materials' }] // 使用别名加载关联的素材
     });
   }
 

@@ -16,11 +16,13 @@ AdGroup.belongsToMany(Material, {
   through: AdGroupMaterial,
   foreignKey: 'ad_group_id',
   otherKey: 'material_id',
+  as: 'Materials',
 });
 Material.belongsToMany(AdGroup, {
   through: AdGroupMaterial,
   foreignKey: 'material_id',
   otherKey: 'ad_group_id',
+  as: 'AdGroups',
 });
 
 // 初始化数据库
