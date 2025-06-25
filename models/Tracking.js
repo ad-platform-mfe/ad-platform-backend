@@ -26,6 +26,16 @@ const Tracking = sequelize.define('Tracking', {
   user_agent: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  type: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: '类型标签，如 电商、品牌、工具等'
+  },
+  mainCategory: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: '主分类，如 互动广告、创意视频'
   }
 }, {
   tableName: 'tracking',

@@ -960,6 +960,14 @@
                   "url": {
                     "type": "string",
                     "description": "事件发生的页面URL"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "可选的类型标签，如 电商、品牌"
+                  },
+                  "mainCategory": {
+                    "type": "string",
+                    "description": "可选的主分类，如 互动广告、创意视频"
                   }
                 },
                 "required": ["event", "url"]

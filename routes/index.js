@@ -11,6 +11,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const adminOnly = require('../middleware/adminOnly');
 const reviewRoutes = require('./review');
 const adGroupRoutes = require('./adGroup');
+const dashboardRoutes = require('./dashboard');
 
 // --- 公开路由 ---
 // 认证相关
@@ -56,5 +57,8 @@ router.delete('/content/:id', contentController.deleteContent);
 router.get('/play_log', playLogController.getAllPlayLogs);
 router.post('/play_log', playLogController.createPlayLog);
 router.delete('/play_log/:id', playLogController.deletePlayLog);
+
+// 新增的dashboard路由
+router.use('/dashboard', dashboardRoutes);
 
 module.exports = router; 
