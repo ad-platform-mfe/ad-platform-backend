@@ -43,6 +43,10 @@
     {
       "name": "广告组管理",
       "description": "管理广告组及其关联的素材"
+    },
+    {
+      "name": "Dashboard",
+      "description": "数据看板相关操作"
     }
   ],
   "paths": {
@@ -389,7 +393,19 @@
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "成功获取用户列表"
+            "description": "成功获取用户列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "获取成功" },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1198,9 +1214,116 @@
           "500": { "description": "服务器错误" }
         }
       }
+    },
+    "/dashboard/kpi": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "获取核心KPI指标",
+        "description": "获取数据看板顶部的四个核心指标卡的数据，包括消耗、展示、点击和CPC，以及它们的日环比趋势。",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "成功获取KPI数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "获取成功" },
+                    "data": { "$ref": "#/components/schemas/KpiStats" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/trend": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "获取核心指标趋势数据",
+        "description": "获取用于绘制核心指标趋势折线图的时间序列数据，包含过去7天的日期标签，以及每天对应的消耗、展示和点击数据。",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "成功获取趋势数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 0 },
+                    "msg": { "type": "string", "example": "获取成功" },
+                    "data": { "$ref": "#/components/schemas/TrendStats" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "role": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "example": "2023-01-01T12:00:00.000Z"
+      },
+      "KpiStats": {
+        "type": "object",
+        "properties": {
+          "cost": { "$ref": "#/components/schemas/KpiDataItem" },
+          "impressions": { "$ref": "#/components/schemas/KpiDataItem" },
+          "clicks": { "$ref": "#/components/schemas/KpiDataItem" },
+          "cpc": { "$ref": "#/components/schemas/KpiDataItem" }
+        }
+      },
+      "KpiDataItem": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "number", "description": "今日数值" },
+          "trend": { "type": "number", "description": "相比昨日的百分比趋势" }
+        }
+      },
+      "TrendStats": {
+        "type": "object",
+        "properties": {
+          "labels": {
+            "type": "array",
+            "items": { "type": "string", "format": "date" },
+            "description": "过去7天的日期字符串数组 (YYYY-MM-DD)",
+            "example": ["2023-07-20", "2023-07-21"]
+          },
+          "cost": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "与labels对应的每日消耗数组"
+          },
+          "impressions": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "与labels对应的每日展示数组"
+          },
+          "clicks": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "与labels对应的每日点击数组"
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",

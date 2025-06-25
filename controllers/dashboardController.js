@@ -9,6 +9,15 @@ class DashboardController {
       res.status(500).json({ message: '获取看板KPI数据失败', error: error.message });
     }
   }
+
+  async getTrendStats(req, res) {
+    try {
+      const stats = await dashboardService.getTrendStats();
+      res.status(200).json({ code: 0, msg: '获取成功', data: stats });
+    } catch (error) {
+      res.status(500).json({ message: '获取看板趋势数据失败', error: error.message });
+    }
+  }
 }
 
 module.exports = new DashboardController(); 

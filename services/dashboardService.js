@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, fn, col, literal } = require('sequelize');
 const Tracking = require('../models/Tracking');
 
 const FIXED_CPC = 0.5; // 假设固定的CPC为0.5元
@@ -59,6 +59,48 @@ class DashboardService {
         value: cpc,
         trend: 0, // CPC是固定的，所以趋势为0
       },
+    };
+  }
+
+  async getTrendStats() {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const results = await Tracking.findAll({
+      attributes: [
+        [fn('date', col('createdAt')), 'date'],
+        [fn('sum', literal(`CASE WHEN event = 'view' THEN 1 ELSE 0 END`)), 'impressions'],
+        [fn('sum', literal(`CASE WHEN event = 'click' THEN 1 ELSE 0 END`)), 'clicks'],
+      ],
+      where: {
+        createdAt: {
+          [Op.gte]: sevenDaysAgo,
+        },
+      },
+      group: [fn('date', col('createdAt'))],
+      order: [[fn('date', col('createdAt')), 'ASC']],
+      raw: true,
+    });
+
+    // 生成过去7天的日期标签
+    const labels = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      return d.toISOString().split('T')[0];
+    }).reverse();
+
+    const dataMap = new Map(results.map(r => [r.date, r]));
+
+    const impressions = labels.map(label => dataMap.get(label)?.impressions || 0);
+    const clicks = labels.map(label => dataMap.get(label)?.clicks || 0);
+    const cost = clicks.map(c => c * FIXED_CPC);
+
+    return {
+      labels,
+      impressions,
+      clicks,
+      cost,
     };
   }
 }
