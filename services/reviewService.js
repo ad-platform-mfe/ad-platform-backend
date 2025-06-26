@@ -1,6 +1,7 @@
 const tencentcloud = require('tencentcloud-sdk-nodejs');
 const { secretId, secretKey, ims: { region } } = require('../config/tencentCloud');
 const { Material } = require('../models');
+const messageService = require('./messageService'); // 引入 messageService
 
 const ImsClient = tencentcloud.ims.v20201229.Client;
 
@@ -79,6 +80,38 @@ class ReviewService {
     const material = await Material.findByPk(materialId);
     if (!material) {
       return null;
+    }
+
+    // --- DEBUG LOG START ---
+    console.log(`[DEBUG] Found material for review. ID: ${material.id}, Title: ${material.title}`);
+    console.log(`[DEBUG] Material's owner User ID: ${material.user_id}`);
+    // --- DEBUG LOG END ---
+
+    // 根据审核状态发送不同通知
+    if (reviewData.reviewStatus === 'approved') {
+      try {
+        await messageService.createMessage({
+          userId: material.user_id,
+          title: '素材审核通过',
+          content: `恭喜！您的素材 "${material.title}" 已成功通过审核。`,
+          type: 'review_approved',
+          meta: { materialId: material.id }
+        });
+      } catch (error) {
+        console.error('创建审核通过通知消息失败:', error);
+      }
+    } else if (reviewData.reviewStatus === 'rejected') {
+      try {
+        await messageService.createMessage({
+          userId: material.user_id,
+          title: '素材审核被驳回',
+          content: `很遗憾，您的素材 "${material.title}" 未能通过审核。原因：${reviewData.reason || '无'}`,
+          type: 'review_rejected',
+          meta: { materialId: material.id, reason: reviewData.reason }
+        });
+      } catch (error) {
+        console.error('创建审核驳回通知消息失败:', error);
+      }
     }
 
     // 更新状态和原因

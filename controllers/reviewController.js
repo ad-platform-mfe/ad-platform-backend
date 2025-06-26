@@ -29,6 +29,11 @@ class ReviewController {
       const { id } = req.params;
       const { reviewStatus, reason } = req.body;
 
+      // --- DEBUG LOG START ---
+      console.log(`[DEBUG] Received manual review request for material ID: ${id}`);
+      console.log(`[DEBUG] Request body:`, req.body);
+      // --- DEBUG LOG END ---
+
       if (!id || !reviewStatus) {
         return res.status(400).json({ message: '缺少素材ID或审核状态' });
       }
