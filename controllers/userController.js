@@ -119,6 +119,27 @@ class UserController {
     }
   }
 
+  // 更新当前登录用户的信息
+  async updateMe(req, res) {
+    const userId = req.user.id;
+    const { username, email, phone } = req.body;
+
+    // 不允许通过此接口更新密码或角色
+    const updateData = { username, email, phone };
+
+    try {
+      const [success] = await userService.updateUser(userId, updateData);
+      if (success) {
+        res.json({ code: 0, msg: '更新个人信息成功' });
+      } else {
+        res.status(404).json({ code: 404, msg: '用户不存在' });
+      }
+    } catch (error) {
+      console.error('更新个人信息错误:', error);
+      res.status(500).json({ code: 500, msg: '更新个人信息失败', error: error.message });
+    }
+  }
+
   // 获取所有用户
   async getAllUsers(req, res) {
     try {
@@ -283,4 +304,4 @@ class UserController {
   }
 }
 
-module.exports = new UserController(); 
+module.exports = new UserController();

@@ -30,4 +30,7 @@ router.post('/reset-password', authController.resetPassword);
 // GET /api/auth/me - 获取当前用户信息 (需要认证)
 router.get('/me', authMiddleware, userController.getMe);
 
+// PUT /api/auth/me - 更新当前用户信息 (需要认证)
+router.put('/me', authMiddleware, userController.updateMe);
+
 module.exports = router; 
