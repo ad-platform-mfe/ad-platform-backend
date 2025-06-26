@@ -9,6 +9,7 @@ const Favorite = require('./Favorite');
 const Comment = require('./Comment');
 const Report = require('./Report');
 const Message = require('./Message');
+const FinanceTransaction = require('./FinanceTransaction');
 
 // 定义模型之间的关系
 // User-Material (一对多)
@@ -45,6 +46,15 @@ Report.belongsTo(Material, { foreignKey: 'materialId' });
 // Message 关联
 Message.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
+// FinanceTransaction 关联
+FinanceTransaction.belongsTo(User, { foreignKey: 'userId' });
+FinanceTransaction.belongsTo(AdGroup, { foreignKey: 'adGroupId' });
+FinanceTransaction.belongsTo(Material, { foreignKey: 'materialId' });
+
+User.hasMany(FinanceTransaction, { foreignKey: 'userId' });
+AdGroup.hasMany(FinanceTransaction, { foreignKey: 'adGroupId' });
+Material.hasMany(FinanceTransaction, { foreignKey: 'materialId' });
+
 // 初始化数据库
 const initDatabase = async () => {
   try {
@@ -66,5 +76,6 @@ module.exports = {
   Favorite,
   Comment,
   Report,
-  Message
+  Message,
+  FinanceTransaction
 }; 

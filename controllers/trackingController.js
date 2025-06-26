@@ -1,9 +1,13 @@
 const trackingService = require('../services/trackingService');
+const financeService = require('../services/financeService');
+const { sequelize } = require('../models');
 
 class TrackingController {
   async trackEvent(req, res) {
+    const t = await sequelize.transaction();
+
     try {
-      const { event, url, type, mainCategory } = req.body;
+      const { event, url, type, mainCategory, materialId, adGroupId } = req.body;
       const user_id = req.user ? req.user.id : null;
       const ip = req.ip;
       const user_agent = req.headers['user-agent'];
@@ -26,10 +30,26 @@ class TrackingController {
         mainCategory
       };
 
-      await trackingService.createTrackingEvent(eventData);
+      await trackingService.createTrackingEvent(eventData, t);
+
+      if (event === 'click' && user_id && adGroupId) {
+        const cpcCost = 0.5;
+
+        await financeService.createSpendTransaction({
+          userId: user_id,
+          adGroupId,
+          materialId,
+          amount: cpcCost,
+          description: `CPC click for material #${materialId}`,
+          meta: { url }
+        }, t);
+      }
+
+      await t.commit();
 
       res.status(204).send();
     } catch (error) {
+      await t.rollback();
       console.error('事件跟踪出错:', error);
       res.status(500).json({
         code: 5000,

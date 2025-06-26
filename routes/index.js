@@ -16,6 +16,7 @@ const adGroupController = require('../controllers/adGroupController');
 const commentRoutes = require('./comment');
 const reportRoutes = require('./report');
 const messageRoutes = require('./message');
+const financeRoutes = require('./finance');
 
 // --- 公开路由 ---
 // 认证相关
@@ -76,5 +77,8 @@ router.use('/reports', reportRoutes);
 
 // 消息相关路由
 router.use('/messages', messageRoutes);
+
+// 财务相关路由
+router.use('/finance', financeRoutes);
 
 module.exports = router; 
