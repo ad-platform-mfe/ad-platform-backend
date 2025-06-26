@@ -5,7 +5,7 @@ class CommentService {
     const comment = await Comment.create(data);
     // 返回包含用户信息的新评论
     return await Comment.findByPk(comment.id, {
-      include: [{ model: User, as: 'user', attributes: ['id', 'username', 'avatar'] }]
+      include: [{ model: User, as: 'user', attributes: ['id', 'username'] }]
     });
   }
 
@@ -17,11 +17,11 @@ class CommentService {
       limit: parseInt(pageSize, 10),
       order: [['createdAt', 'DESC']],
       include: [
-        { model: User, as: 'user', attributes: ['id', 'username', 'avatar'] },
+        { model: User, as: 'user', attributes: ['id', 'username'] },
         {
           model: Comment,
           as: 'Replies',
-          include: [{ model: User, as: 'user', attributes: ['id', 'username', 'avatar'] }]
+          include: [{ model: User, as: 'user', attributes: ['id', 'username'] }]
         }
       ]
     });

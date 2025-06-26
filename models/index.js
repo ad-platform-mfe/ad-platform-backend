@@ -7,6 +7,7 @@ const PlayLog = require('./PlayLog');
 const Tracking = require('./Tracking');
 const Favorite = require('./Favorite');
 const Comment = require('./Comment');
+const Report = require('./Report');
 
 // 定义模型之间的关系
 // User-Material (one-to-many)
@@ -36,10 +37,14 @@ Comment.belongsTo(Material, { foreignKey: 'materialId' });
 Comment.hasMany(Comment, { as: 'Replies', foreignKey: 'parentId', useJunctionTable: false });
 Comment.belongsTo(Comment, { as: 'Parent', foreignKey: 'parentId' });
 
+// Report associations
+Report.belongsTo(User, { as: 'reporter', foreignKey: 'reporterId' });
+Report.belongsTo(Material, { foreignKey: 'materialId' });
+
 // 初始化数据库
 const initDatabase = async () => {
   try {
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log('数据库同步成功');
   } catch (error) {
     console.error('数据库同步失败:', error);
@@ -55,5 +60,6 @@ module.exports = {
   PlayLog,
   Tracking,
   Favorite,
-  Comment
+  Comment,
+  Report
 }; 

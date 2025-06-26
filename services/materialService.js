@@ -1,4 +1,4 @@
-const { Material, User } = require('../models');
+const { Material, User, AdGroup } = require('../models');
 
 class MaterialService {
   /**
@@ -30,11 +30,23 @@ class MaterialService {
    */
   async getMaterialById(id) {
     return await Material.findByPk(id, {
-      include: [{
-        model: User,
-        as: 'user',
-        attributes: ['id', 'username', 'email']
-      }]
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'username']
+        },
+        {
+          model: AdGroup,
+          through: { attributes: [] } 
+        },
+        {
+          model: User,
+          as: 'FavoritingUsers',
+          attributes: ['id'], 
+          through: { attributes: [] }
+        }
+      ]
     });
   }
 
